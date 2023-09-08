@@ -1,23 +1,46 @@
-import logo from './logo.svg';
+import React, { useState, useEffect } from 'react';
+import PersonDisplay from './components/PersonDisplay/index.js';
+import NextButton from './components/NextButton/index.js';
 import './App.css';
 
 function App() {
+  const [jsonData, setJsonData] = useState([]);
+  const [displayedPeople, setDisplayedPeople] = useState([]);
+  const [startIndex, setStartIndex] = useState(0);
+
+
+  useEffect(() => {
+    fetch('/data.json')
+      .then((response) => response.json())
+      .then((data) => setJsonData(data));
+  }, []);
+
+  useEffect(() => {
+    const endIndex = startIndex + 3;
+    setDisplayedPeople(jsonData.slice(startIndex, endIndex));
+  }, [startIndex, jsonData]);
+
+  const nextPeople = () => {
+    if (startIndex + 3 < jsonData.length) {
+      setStartIndex(startIndex + 3);
+    } else {
+      alert('No more people!');
+    }
+  };
+
+
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h1 className='h1'>PEOPLE DATA</h1>
+      <NextButton onClick={nextPeople} />
+      <div>
+        {displayedPeople.map((person, index) => (
+          <PersonDisplay key={index} person={person} count={startIndex + index + 1} />
+        ))}
+      </div>
+      <p className='p'>CURRENTLY  {displayedPeople.length} PEOPLE SHOWING</p>
+
     </div>
   );
 }
